@@ -21,6 +21,7 @@ We're attempting to reproduce the effect that toon shaders produce on 3D models 
   However, upon further research we came to the conclusion that the Bilateral Filtering method would be perfect for what we're trying to achieve, since it retains the edges while averaging the rest. It's generally used to remove noise, but if we turn it up to 11 it might as well give us the cartoonish feel we want!
 
 Our first sample image:
+
 ![Sample Cat 1](Cats/cat.jpg)
 
 Awn. How Cute.
