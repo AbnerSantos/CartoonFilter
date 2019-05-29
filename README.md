@@ -21,7 +21,7 @@ We're attempting to reproduce the effect that toon shaders produce on 3D models 
   However, upon further research we came to the conclusion that the Bilateral Filtering method would be perfect for what we're trying to achieve, since it retains the edges while averaging the rest. It's generally used to remove noise, but if we turn it up to 11 it might as well give us the cartoonish feel we want!
 
 Our first sample image:
-![Sample Cat 1](cat.png)
+![Sample Cat 1](Cats/cat.png)
 
 Awn. How Cute.
 
@@ -30,7 +30,7 @@ So, first we'll apply the bilateral filter a couple of times, let's start wih 5,
 NumOfDownSamplings: 1
 NumOfBilateralFilterings: 5
 KernelSize: 9
-![Sample Cat 1: Bilateral 5t 9k](Cats\catbilateral5t9k.jpg)
+![Sample Cat 1: Bilateral 5t 9k](Cats/catbilateral5t9k.jpg)
 
 Well won't you look at that! We're going places!
 But it's not quite there yet, it's still too subtle and not cartoonish enough, but it seems like it'll work.
@@ -38,14 +38,14 @@ Now let's try to apply the filter even more times, let's say... 15.
 
 NumOfBilateralFilterings: 15
 KernelSize: 9
-![Sample Cat 1: Bilateral 15t 9k](Cats\catbilateral15t9k.jpg)
+![Sample Cat 1: Bilateral 15t 9k](Cats/catbilateral15t9k.jpg)
 
 Erm... that didn't really change anything.
 Let's try changing the kernel size instead. What about 20?
 
 NumOfBilateralFilterings: 7
 KernelSize: 20
-![Sample Cat 1: Bilateral 7t 20k](Cats\catbilateral7t20k.jpg)
+![Sample Cat 1: Bilateral 7t 20k](Cats/catbilateral7t20k.jpg)
 
 Nope. Not a lot changed, once again. What to do...
 After some meddling and more research, we found out that perhaps applying the filter to each of the color channels (Red, Green and Blue) may generate better results. Let's try that.
@@ -53,25 +53,25 @@ After some meddling and more research, we found out that perhaps applying the fi
 NumOfBilateralFilterings: 7
 KernelSize: 20
 AppliedToEachChannel: true
-![Sample Cat 1: Bilateral 7t 20k](Cats\cateachchannel7t20k.jpg)
+![Sample Cat 1: Bilateral 7t 20k](Cats/cateachchannel7t20k.jpg)
 
 There we go! Perfect! That's what we want!
 Now let's do it to Moacir's cats!
 
-![Moacir Cat 1: Bilateral 7t 20k](Cats\CatMoacir1.jpg)
-![Moacir Cat 2: Bilateral 7t 20k](Cats\CatMoacir2.jpg)
-![Moacir Cat 3: Bilateral 7t 20k](Cats\CatMoacir3.jpg)
-![Moacir Cat 4: Bilateral 7t 20k](Cats\CatMoacir4.jpg)
+![Moacir Cat 1: Bilateral 7t 20k](Cats/CatMoacir1.jpg)
+![Moacir Cat 2: Bilateral 7t 20k](Cats/CatMoacir2.jpg)
+![Moacir Cat 3: Bilateral 7t 20k](Cats/CatMoacir3.jpg)
+![Moacir Cat 4: Bilateral 7t 20k](Cats/CatMoacir4.jpg)
 
 Adorable! Success!
 
 We algo tried to do some edge detection to add an option to add outlines to the resulting images, but we're not yet satisfied with the results. We used an edge detection convolution with the kernel [-1, -1, -1] [-1, 8, -1] [-1, -1, -1] for each color, which gave us this:
 
-![Sample Cat 1: Color Edge](catedgecolor.jpg)
+![Sample Cat 1: Color Edge](Cats/catedgecolor.jpg)
 
 Then applied a threshold:
 
-![Sample Cat 1: Color Edge](catedge.jpg)
+![Sample Cat 1: Color Edge](Cats/catedge.jpg)
 
 Well, it's interesting but still needs some more meddling to work the way we want, then we need to actually color that outline and apply it to the image. The problem is that it still detects too much of the fur and details.
 
