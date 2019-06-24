@@ -1,17 +1,17 @@
 # CartoonFilter
 Filter that attempts to, given a photo or any other image, to "cartoonize" the image, similar to what toon and outline shaders do with 3D models, but applied to 2D.
 
-# Partial Report
-We're attempting to reproduce the effect that toon shaders produce on 3D models but on 2D images instead, more specifically on cute pictures of cats. Because why the heck not, right? The internet is full of them! A marvelous sample size!
+# Final Report
+We were able to reproduce the effect that toon shaders produce on 3D models but on 2D images instead, more specifically on cute pictures of cats and also furniture, which wasn't intially planned but worked out really great!
 
 ## Filters and Techniques Used
 * Bilateral Filtering
-* 2D Convolution for Edge Detection
+* 2D Convolution with Laplacian Operator for Edge Detection
+* Morphological Image Processing: Erosion and Dilation
 
 ## Libraries/Packages Used
 * Python
 * Numpy
-* MatPlotlib (for visualization)
 * OpenCV
 
 ## Explanation
@@ -20,60 +20,49 @@ We're attempting to reproduce the effect that toon shaders produce on 3D models 
   Then, we thought of getting the hsv color space of the image and setting dynamic color thresholds or buckets to merge all similar colors into one, a histogram based filter.
   However, upon further research we came to the conclusion that the Bilateral Filtering method would be perfect for what we're trying to achieve, since it retains the edges while averaging the rest. It's generally used to remove noise, but if we turn it up to 11 it might as well give us the cartoonish feel we want!
 
-Our first sample image:
+<!-- Aqui colocam a explicacao do bilateral 
+    Implementacao do nosso bilateral
+    Comparar com o bilateral do opencv
+    Aumento da saturacao
+    Downsampling
+    Mostra com mobília tambem
+-->
 
-![Sample Cat 1](Cats/cat.jpg)
+We also decided to do some edge detection to create outlines for the images, but it would be optional to the user.
+We start with a convolution with the Laplacian Operator ((-1, -1, -1), (-1, 8, -1), (-1, -1, -1)) as the kernel for the grayscale version of the cartoon image
 
-Awn. How Cute.
-
-So, first we'll apply the bilateral filter a couple of times, let's start wih 5, and with a kernel size of 9.
-
-NumOfDownSamplings: 1
-NumOfBilateralFilterings: 5
-KernelSize: 9
-![Sample Cat 1: Bilateral 5t 9k](Cats/catbilateral5t9k.jpg)
-
-Well won't you look at that! We're going places!
-But it's not quite there yet, it's still too subtle and not cartoonish enough, but it seems like it'll work.
-Now let's try to apply the filter even more times, let's say... 15.
-
-NumOfBilateralFilterings: 15
-KernelSize: 9
-![Sample Cat 1: Bilateral 15t 9k](Cats/catbilateral15t9k.jpg)
-
-Erm... that didn't really change anything.
-Let's try changing the kernel size instead. What about 20?
-
-NumOfBilateralFilterings: 7
-KernelSize: 20
-![Sample Cat 1: Bilateral 7t 20k](Cats/catbilateral7t20k.jpg)
-
-Nope. Not a lot changed, once again. What to do...
-After some meddling and more research, we found out that perhaps applying the filter to each of the color channels (Red, Green and Blue) may generate better results. Let's try that.
-
-NumOfBilateralFilterings: 7
-KernelSize: 20
-AppliedToEachChannel: true
-![Sample Cat 1: Bilateral 7t 20k](Cats/cateachchannel7t20k.jpg)
-
-There we go! Perfect! That's what we want!
-Now let's do it to Moacir's cats!
-
-![Moacir Cat 1: Bilateral 7t 20k](Cats/CatMoacir1.jpg)
-![Moacir Cat 2: Bilateral 7t 20k](Cats/CatMoacir2.jpg)
-![Moacir Cat 3: Bilateral 7t 20k](Cats/CatMoacir3.jpg)
-![Moacir Cat 4: Bilateral 7t 20k](Cats/CatMoacir4.jpg)
-
-Adorable! Success!
-
-We algo tried to do some edge detection to add an option to add outlines to the resulting images, but we're not yet satisfied with the results. We used an edge detection convolution with the kernel [-1, -1, -1] [-1, 8, -1] [-1, -1, -1] for each color, which gave us this:
-
-![Sample Cat 1: Color Edge](Cats/catedgecolor.jpg)
+![Sample Cat 1: Edge](Cats/Final/Edge.png)
 
 Then applied a threshold:
 
-![Sample Cat 1: Color Edge](Cats/catedge.jpg)
+![Sample Cat 1: Threshold Edge](Cats/Final/EdgeThreshold.png)
 
-Well, it's interesting but still needs some more meddling to work the way we want, then we need to actually color that outline and apply it to the image. The problem is that it still detects too much of the fur and details.
+As we can see, there is still a lot of noise and it gets a lot of details we don't want.
+To solve that, we decided to add some morphological operations to the edges. More especifically, an erosion.
+After some testing we ended up using a circle-like mask/kernel of size 3 ((0, 1, 0), (1, 1, 1), (0, 1, 0)) for the erosion and apply it only once, which led to great results:
 
-We want to work on that edge detection and perhaps also as a bonus use openCV's image detection to detect whether or not it is a cat! But for the partial report, that's it!
+![Sample Cat1: Treated Edges](Cats/Final/Erosion.png)
+
+Great! A lot of the noise and unwanted details are gone.
+We thought of then dilating to complete an opening operation, but we results weren't so great:
+
+![Sample Cat1: Treated Edges 2](Cats/Final/Dilation.png)
+
+We ended up not leaving it because the results were better without it. We also tried other possibilities, such as: 2 erosions, 1 dilation, 1 dilation 2 erosions, 2 erosions 2 dilations, and even applying a gaussian blur after the erosion, but overall, the best results were just to erode once.
+
+Now we have to apply those edges to the image. Previously we would just add them in in white, because adding them in black led to highlights being lost, such as on the cat's eyes:
+
+![Sample Cat1: Black Outlines](Cats/Final/Demon.png)
+
+Yikes. Nope.
+
+Then we decided for a while to leave the outlines white:
+
+![Sample Cat1: White Outlines](Cats/Final/WhiteOutline.png)
+
+Which is better, but still not optimal.
+So we tried a different approach: In drawings, the outlines aren't always black or white, generally they are just a darker/brighter, more saturated version of the color in that area. So, we decided that if the brightness of a pixel in the outline is high, we decrease it by 20%, or else if it's low, we increase it by 20%:
+
+![Sample Cat1: Final Outlines](Cats/Final/FinalOutline.png)
+
+Not too shabby! It's not what we wanted to achieve initially but it does a great job of making a good looking outline whilst sharpening the edges as well.
