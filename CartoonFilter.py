@@ -21,6 +21,13 @@ def gaussian_filter (k=3, sigma=1.0):
     filt = np.exp(-(1/2)*(np.square(x) + np.square(y)) / np.square(sigma))
     return filt / np.sum(filt)
 
+'''
+    Generic morphological function
+    Used for both dilation and erosion
+        kernel: Mask
+        base_outline: Raw edges
+        func: Function pointer (Max for dilation, Min for erosion)
+'''
 def morph (kernel, base_outline, func):
     new_outline = np.zeros(base_outline.shape)
     k = kernel.shape[0]
