@@ -20,11 +20,20 @@ We were able to reproduce the effect that toon shaders produce on 3D models but 
   Then, we thought of getting the hsv color space of the image and setting dynamic color thresholds or buckets to merge all similar colors into one, a histogram based filter.
   However, upon further research we came to the conclusion that the Bilateral Filtering method would be perfect for what we're trying to achieve, since it retains the edges while averaging the rest. It's generally used to remove noise, but if we turn it up to 11 it might as well give us the cartoonish feel we want!
 
+First, we tried using the OpenCV bilateral filter, to test and see if the bilateral filter would produce what we wanted. 
+After setting some variables, the OpenCV bilateral filter produced exactly what we were looking for: cartoonized cats!
+
+![Sample Cat 1: OpenCV Bilateral Filter](Cats/Final/GatoFofinho_cartoon.png)
+
+So, we decided to code our own Bilateral Filter, expecting we would get similar results, but that's not what happened.
+Our Bilateral Filter didn't get to produce cartoonized cats, but stained glass cat filter!
+
+![Sample Cat 1: Our Bilateral Filter](Cats/Final/GatoFofinho_stained_glass.png)
+
+While making our bilateral filter, we faced a problem: the images were so big that the program would take too much time to run, sometimes taking more than 5 minutes. After that we decided to downsample the image, so the program could run faster.
+
 <!-- Aqui colocam a explicacao do bilateral 
-    Implementacao do nosso bilateral
-    Comparar com o bilateral do opencv
     Aumento da saturacao
-    Downsampling
     Mostra com mobília tambem
 -->
 
