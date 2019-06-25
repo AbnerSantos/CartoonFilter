@@ -38,8 +38,8 @@ Then applied a threshold:
 ![Sample Cat 1: Threshold Edge](Cats/Final/EdgeThreshold.png)
 
 As we can see, there is still a lot of noise and it gets a lot of details we don't want.
-To solve that, we decided to add some morphological operations to the edges. More especifically, an erosion.
-After some testing we ended up using a circle-like mask/kernel of size 3 ((0, 1, 0), (1, 1, 1), (0, 1, 0)) for the erosion and apply it only once, which led to great results:
+To solve that, we decided to add some morphological operations to the edges. More especifically, an opening, witch is a dilation followed by an erosion.
+After some testing we ended up using a circle-like mask/kernel of size 3 ((0, 1, 0), (1, 1, 1), (0, 1, 0)) for the and apply it only once, which led to great results:
 
 ![Sample Cat1: Treated Edges](Cats/Final/Erosion.png)
 
@@ -48,7 +48,7 @@ We thought of then dilating to complete an opening operation, but we results wer
 
 ![Sample Cat1: Treated Edges 2](Cats/Final/Dilation.png)
 
-We ended up not leaving it because the results were better without it. We also tried other possibilities, such as: 2 erosions, 1 dilation, 1 dilation 2 erosions, 2 erosions 2 dilations, and even applying a gaussian blur after the erosion, but overall, the best results were just to erode once.
+We ended up not using it since the results were better without it. We also tried other possibilities, such as: 2 erosions, 1 dilation, 1 dilation 2 erosions, 2 erosions 2 dilations, and even applying a gaussian blur after the erosion, but overall, the best results were just to erode once.
 
 Now we have to apply those edges to the image. Previously we would just add them in in white, because adding them in black led to highlights being lost, such as on the cat's eyes:
 
