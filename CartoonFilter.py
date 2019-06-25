@@ -1,9 +1,33 @@
+'''
+    Name: Abner Eduardo Silveira Santos
+    USP number: 10692012
+    Name: Gyovana Mayara Moriyama
+    USP number: 10734387
+    Name: Henrique Matarazo Camillo
+    USP number: 10294943
+    Course and Ingress Year: BCC 2018
+    Year: 2019
+    Semester: 1st
+    Course Code: SCC0251
+    Title: Cartoon Filter
+'''
+
 import numpy as np
 import cv2
 import os
 
+# Threshold, for edge detection
 threshold = 150
-num_bilateral = 7  
+
+# Number of times the 
+num_bilateral = 7
+
+# Custom bilateral filter parameters
+sigma_s = 4
+sigma_r = 0.2
+kernel_size = 3
+
+# OpenCV bilateral filter parameters
 d = 20
 sigma_color = 9
 sigma_space = 7
@@ -52,11 +76,73 @@ def erosion (kernel, base_outline):
     func = np.min
     return morph(kernel, base_outline, func)
 
-# Reads the image
-filename = str(input()).rstrip() 
+'''
+    Applies bilateral filter to an image, and returns it    
+        Parameters:
+            image       =   original image
+            kernel_size =   kernel size
+            sigma_s     =   spatial sigma
+            sigma_r     =   range sigma
+'''
+def bilateral_filter(image, kernel_size, sigma_s, sigma_r):
+    size_x, size_y = image.shape
 
+    offset = kernel_size // 2
+
+    # Calculates the kernels for sigma_s and sigma_r
+    kernel_s = gaussian_filter(kernel_size, sigma_s)
+    kernel_r = gaussian_filter(kernel_size, sigma_r)
+
+    new_image = np.array(image, copy=True).astype(float)
+
+    # For each pixel in the image
+    for x in range(size_x):
+        for y in range(size_y):
+            # If the submatrix won't go out of edges
+            if not(x - offset < 0 or x + offset >= size_x or y - offset < 0 or y + offset >= size_y):
+                # Gets the submatrix
+                sub_matrix = image[(x-offset):(x+offset+1), (y-offset):(y+offset+1)]
+
+                # Calculates the two parts of the equation
+                spatial_gaussian = np.multiply(sub_matrix, kernel_s)
+                range_gaussian   = np.multiply(np.absolute(np.subtract(sub_matrix, image[x,y])), kernel_r) 
+                
+                # Multiplies the tow parts of the equation, getting a partial result, from where we can get the normalization factor
+                result = np.multiply(spatial_gaussian, range_gaussian)
+                normalization_factor = np.sum(result)
+
+                # Gets the result matrix multiplying the parcial result by the original sub matrix
+                result = np.multiply(result, sub_matrix)
+                result = np.sum(result)
+
+                # Normalizes the pixel, if the normalization factor isn't zero
+                if (normalization_factor != 0):
+                    result = np.divide(result, normalization_factor)
+                # If it's zero, doesn't change the pixel
+                else:
+                    result = image[x,y]
+
+                # The final result is the sum of the result matrix
+                new_image[x,y] = result
+
+    # Returns the image
+    return new_image
+
+# Reads inputs
+filename = str(input("Insert the image filename\n")).rstrip() 
 image = cv2.imread(filename)
 
+filter_option = int(input("\nChoose the bilateral filter:\n\t1 - OpenCV Bilateral Filter\n\t2 - Custom Bilateral Filter\n"))
+if (filter_option > 2 or filter_option < 1):
+    print("Invalid option")
+    exit(0)
+
+edges_option = int(input("\nDo you want the image with or without edges?:\n\t1 - With edges\n\t2 - Without edges\n"))
+if (edges_option != 1 and edges_option != 2):
+    print("Invalid option")
+    exit(0)
+
+# Downsamples the image
 while image.shape[0] > 512  and image.shape[1] > 512:
     image = cv2.pyrDown(image)
 
@@ -71,15 +157,34 @@ for _ in range(num_bilateral):
     blue  = np.clip(image_cartoon[:,:,2], 0, 255)
 
     # Applies filtering
-    red   = cv2.bilateralFilter(image_cartoon[:,:,0], d, sigma_color, sigma_space)
-    green = cv2.bilateralFilter(image_cartoon[:,:,1], d, sigma_color, sigma_space)
-    blue  = cv2.bilateralFilter(image_cartoon[:,:,2], d, sigma_color, sigma_space)
+    if filter_option == 1:
+        red   = cv2.bilateralFilter(image_cartoon[:,:,0], d, sigma_color, sigma_space)
+        green = cv2.bilateralFilter(image_cartoon[:,:,1], d, sigma_color, sigma_space)
+        blue  = cv2.bilateralFilter(image_cartoon[:,:,2], d, sigma_color, sigma_space)
+    elif filter_option == 2:
+        red     = bilateral_filter(image_cartoon[:,:,0], kernel_size,sigma_s, sigma_r)
+        green   = bilateral_filter(image_cartoon[:,:,1], kernel_size, sigma_s, sigma_r)
+        blue    = bilateral_filter(image_cartoon[:,:,2], kernel_size, sigma_s, sigma_r)
+
 
     # Copies to each channel of the cartoonized image
     image_cartoon[:,:,0] = red
     image_cartoon[:,:,1] = green
     image_cartoon[:,:,2] = blue
 
+# Displays the cartoonized image
+cv2.imshow("Cartoon", image_cartoon)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# If the user chose the image without edges, finishes the program writing the image
+if edges_option == 2:
+    new_filename = os.path.splitext(filename)[0] + "_cartoon.png"
+    cv2.imwrite(new_filename, image_cartoon)
+
+    exit(0)
+        
+# Else, continues to edge detection
 image_cartoon = cv2.cvtColor(image_cartoon, cv2.COLOR_BGR2HSV)
 
 # Applies threshold
@@ -91,11 +196,6 @@ for x in range(image_cartoon.shape[0]):
             image_cartoon[x, y][1] *= 1.1
 
 image_cartoon = cv2.cvtColor(image_cartoon, cv2.COLOR_HSV2BGR)
-
-# Displays the cartoonized image
-cv2.imshow("cartoon", image_cartoon)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
 
 # Creates a gray copy of the cartoon image
 image_edges = np.array(image_cartoon, copy=True)
@@ -135,9 +235,6 @@ cv2.imshow("edges with treatment", image_edges)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-new_filename = os.path.splitext(filename)[0] + "_cartoon.png"
-cv2.imwrite(new_filename, image_cartoon)
-
 image_levels = cv2.cvtColor(image_cartoon, cv2.COLOR_BGR2GRAY)
 image_cartoon = cv2.cvtColor(image_cartoon, cv2.COLOR_BGR2HSV)
 
@@ -162,5 +259,6 @@ cv2.imshow("Image with edges", image_cartoon)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
+# Writes the image
 new_filename = os.path.splitext(filename)[0] + "_cartoon_outline.png"
 cv2.imwrite(new_filename, image_cartoon)
