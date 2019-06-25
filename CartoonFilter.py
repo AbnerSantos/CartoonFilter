@@ -135,7 +135,7 @@ cv2.imshow("edges with treatment", image_edges)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-new_filename = os.path.splitext(filename)[0] + "_cartoonized.png"
+new_filename = os.path.splitext(filename)[0] + "_cartoon.png"
 cv2.imwrite(new_filename, image_cartoon)
 
 image_levels = cv2.cvtColor(image_cartoon, cv2.COLOR_BGR2GRAY)
@@ -161,3 +161,6 @@ image_cartoon = cv2.cvtColor(image_cartoon, cv2.COLOR_HSV2BGR)
 cv2.imshow("Image with edges", image_cartoon)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+new_filename = os.path.splitext(filename)[0] + "_cartoon_outline.png"
+cv2.imwrite(new_filename, image_cartoon)
