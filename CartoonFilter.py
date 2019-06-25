@@ -228,7 +228,6 @@ cv2.destroyAllWindows()
 
 kernel = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
 image_edges = erosion(kernel, image_edges)
-# image_edges = dilation(kernel, image_edges)
 
 # Displays the edges after morphological operations
 cv2.imshow("edges with treatment", image_edges)

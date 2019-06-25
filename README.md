@@ -32,10 +32,11 @@ Our Bilateral Filter didn't get to produce cartoonized cats, but stained glass c
 
 While making our bilateral filter, we faced a problem: the images were so big that the program would take too much time to run, sometimes taking more than 5 minutes. After that we decided to downsample the image, so the program could run faster.
 
-<!-- Aqui colocam a explicacao do bilateral 
-    Aumento da saturacao
-    Mostra com mobília tambem
--->
+After applying the bilateral filter, we decided to change a little bit the saturation of the image to make it more cartoonish, increasing it in 20%.
+
+While testing our program in different photos, we noticed that it works well when applied to furniture, probably because they usually are flat and have simple patterns, when compared to cats, that have a lot of fur with many colors.
+
+![Furniture](Cats/Final/Furniture_cartoon.png)
 
 We also decided to do some edge detection to create outlines for the images, but it would be optional to the user.
 We start with a convolution with the Laplacian Operator ((-1, -1, -1), (-1, 8, -1), (-1, -1, -1)) as the kernel for the grayscale version of the cartoon image
@@ -75,3 +76,12 @@ So we tried a different approach: In drawings, the outlines aren't always black 
 ![Sample Cat1: Final Outlines](Cats/Final/FinalOutline.png)
 
 Not too shabby! It's not what we wanted to achieve initially but it does a great job of making a good looking outline whilst sharpening the edges as well.
+
+
+# Image References
+http://kastenbloom.com/wooden-decor/wooden-decor-wooden-decoration-for-wall-wooden-log-and-slice-home-decor-ideas/
+https://www.facebook.com/162212024341406/photos/a.162215161007759/162215077674434/?type=1&theater
+https://twitter.com/ponti3/status/1096413217428045825
+https://twitter.com/ponti3/status/1079036093478195200
+https://twitter.com/ponti3/status/1044542276154929152
+https://twitter.com/ponti3/status/998579527868657664
